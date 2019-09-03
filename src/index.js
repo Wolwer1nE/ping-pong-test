@@ -1,36 +1,9 @@
 ;(function() {
 
   const canvas = document.getElementById("cnvs");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
 
-  const platform = {
-    width: 400,
-    height: 50,
-  };
-  const gameState = {
-    redSqure: {
-      x: 100,
-      y: canvas.height - platform.height/2,
-      width: platform.width,
-      height: platform.height
-    },
-    pointer: {
-      x: 0,
-      y: 0,
-    },
-    ball:{
-      x:canvas.width/2,
-      y:0,
-      radius: 25,
-      vx:0,
-      vy:5
-    },
-  tickLength: 50
-  };
 
-  canvas.addEventListener('mousemove', onMouseMove, false);
-  canvas.addEventListener("click", onMouseClick, false);
+  const gameState = {};
 
   function onMouseMove(e) {
     gameState.pointer.x = e.pageX;
@@ -52,7 +25,7 @@
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    const {x, y, width, height} = gameState.redSqure;
+    const {x, y, width, height} = gameState.redSquare;
 
     context.beginPath();
     context.rect(x - width/ 2, y - height/2, width, height);
@@ -70,8 +43,8 @@
 
   }
   function update(tick) {
-    const vx = (gameState.pointer.x - gameState.redSqure.x) / 10;
-    gameState.redSqure.x += vx;
+    const vx = (gameState.pointer.x - gameState.redSquare.x) / 10;
+    gameState.redSquare.x += vx;
     gameState.ball.y += gameState.ball.vy;
     gameState.ball.y += gameState.ball.vx;
 
@@ -102,17 +75,40 @@
   }
 
   function setup() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    canvas.addEventListener('mousemove', onMouseMove, false);
+    canvas.addEventListener("click", onMouseClick, false);
+
     gameState.lastTick = performance.now();
     gameState.lastRender = gameState.lastTick;
+    gameState.tickLength = 15 //ms
+
+    const platform = {
+      width: 400,
+      height: 50,
+    };
+
+    gameState.redSquare = {
+      x: 100,
+      y: canvas.height - platform.height/2,
+      width: platform.width,
+      height: platform.height
+    };
+    gameState.pointer = {
+      x: 0,
+      y: 0,
+    };
+    gameState.ball = {
+      x: canvas.width / 2,
+      y: 0,
+      radius: 25,
+      vx: 0,
+      vy: 5
+    }
   }
 
   setup();
   run();
 })();
-
-
-
-
-
-
-
