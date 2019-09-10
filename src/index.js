@@ -1,114 +1,109 @@
-;(function() {
+const canvas = document.getElementById("cnvs");
 
-  const canvas = document.getElementById("cnvs");
+const gameState = {};
 
-
-  const gameState = {};
-
-  function onMouseMove(e) {
+function onMouseMove(e) {
     gameState.pointer.x = e.pageX;
     gameState.pointer.y = e.pageY
-  }
+}
 
-  function onMouseClick(e) {
-    window.cancelAnimationFrame( gameState.stopCycle );
-  }
-  function queueUpdates( numTicks ) {
-    for(let i=0; i < numTicks; i++) {
-      gameState.lastTick = gameState.lastTick + gameState.tickLength;
-      update( gameState.lastTick );
+function queueUpdates(numTicks) {
+    for (let i = 0; i < numTicks; i++) {
+        gameState.lastTick = gameState.lastTick + gameState.tickLength;
+        update(gameState.lastTick);
     }
-  }
-  function draw(tFrame) {
+}
+
+function draw(tFrame) {
     const context = canvas.getContext('2d');
 
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    const {x, y, width, height} = gameState.redSquare;
+    drawPlatform(context)
+    drawBall(context)
+}
 
-    context.beginPath();
-    context.rect(x - width/ 2, y - height/2, width, height);
-    context.fillStyle = "#FF0000";
-    context.fill();
-    context.closePath();
+function update(tick) {
 
-    const ball = gameState.ball;
+    const vx = (gameState.pointer.x - gameState.player.x) / 10
+    gameState.player.x += vx
 
-    context.beginPath();
-    context.arc(ball.x, ball.y, ball.radius, 0, 2*Math.PI);
-    context.fillStyle = "#0000FF";
-    context.fill();
-    context.closePath();
+    const ball = gameState.ball
+    ball.y += ball.vy
+    ball.y += ball.vx
+}
 
-  }
-  function update(tick) {
-    const vx = (gameState.pointer.x - gameState.redSquare.x) / 10;
-    gameState.redSquare.x += vx;
-    gameState.ball.y += gameState.ball.vy;
-    gameState.ball.y += gameState.ball.vx;
-
-    if (gameState.ball.y >= canvas.height)
-    {
-      gameState.ball.vy = -10;
-      gameState.ball.y += gameState.ball.vx
-    }
-    else if  (gameState.ball.y <= 0)
-    {
-      gameState.ball.vy =  10
-    }
-  }
-
-  function run(tFrame) {
-    gameState.stopCycle = window.requestAnimationFrame( run );
+function run(tFrame) {
+    gameState.stopCycle = window.requestAnimationFrame(run);
 
     const nextTick = gameState.lastTick + gameState.tickLength;
     let numTicks = 0;
 
     if (tFrame > nextTick) {
-      const timeSinceTick = tFrame - gameState.lastTick;
-      numTicks = Math.floor( timeSinceTick / gameState.tickLength );
+        const timeSinceTick = tFrame - gameState.lastTick;
+        numTicks = Math.floor(timeSinceTick / gameState.tickLength);
     }
-    queueUpdates( numTicks );
-    draw( tFrame );
+    queueUpdates(numTicks);
+    draw(tFrame);
     gameState.lastRender = tFrame;
-  }
+}
 
-  function setup() {
+function stopGame(handle) {
+    window.cancelAnimationFrame(handle);
+}
+
+function drawPlatform(context) {
+    const {x, y, width, height} = gameState.player;
+    context.beginPath();
+    context.rect(x - width / 2, y - height / 2, width, height);
+    context.fillStyle = "#FF0000";
+    context.fill();
+    context.closePath();
+}
+
+function drawBall(context) {
+    const {x, y, radius} = gameState.ball;
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.fillStyle = "#0000FF";
+    context.fill();
+    context.closePath();
+}
+
+function setup() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     canvas.addEventListener('mousemove', onMouseMove, false);
-    canvas.addEventListener("click", onMouseClick, false);
 
     gameState.lastTick = performance.now();
     gameState.lastRender = gameState.lastTick;
-    gameState.tickLength = 15 //ms
+    gameState.tickLength = 15; //ms
 
     const platform = {
-      width: 400,
-      height: 50,
+        width: 400,
+        height: 50,
     };
 
-    gameState.redSquare = {
-      x: 100,
-      y: canvas.height - platform.height/2,
-      width: platform.width,
-      height: platform.height
+    gameState.player = {
+        x: 100,
+        y: canvas.height - platform.height / 2,
+        width: platform.width,
+        height: platform.height
     };
     gameState.pointer = {
-      x: 0,
-      y: 0,
+        x: 0,
+        y: 0,
     };
     gameState.ball = {
-      x: canvas.width / 2,
-      y: 0,
-      radius: 25,
-      vx: 0,
-      vy: 5
+        x: canvas.width / 2,
+        y: 0,
+        radius: 25,
+        vx: 0,
+        vy: 5
     }
-  }
+}
 
-  setup();
-  run();
-})();
+setup();
+run();
