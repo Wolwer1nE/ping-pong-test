@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Wolwer1nE/ping-pong-test#readme",
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "parcel": "^1.12.3"
+    "@babel/core": "^7.19.1",
+    "@parcel/babel-preset-env": "^2.7.0" ,
+    "parcel": "^2.7.0"
   }
 }
